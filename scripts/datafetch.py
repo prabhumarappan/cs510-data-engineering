@@ -11,7 +11,8 @@ CTRAN_API = "http://www.psudataeng.com:8000/getBreadCrumbData"
 # Function to get the file name for the new file
 def get_output_file_path():
     script_path = os.path.realpath(__file__)
-    script_folder = script_path.replace(__file__, '')
+    file_name = os.path.basename(__file__)
+    script_folder = script_path.replace(file_name, '')
     data_folder = os.path.join(script_folder, 'data')
 
     if not os.path.isdir(data_folder):
@@ -25,7 +26,8 @@ def get_output_file_path():
 # Check if file with the same name exists, in that case, change the name to 
 def check_output_file(f_path):
     script_path = os.path.realpath(__file__)
-    script_folder = script_path.replace(__file__, '')
+    file_name = os.path.basename(__file__)
+    script_folder = script_path.replace(file_name, '')
     data_folder = os.path.join(script_folder, 'data')
 
     just_file_name = f_path.replace('.json', '')
@@ -42,7 +44,8 @@ def get_api_response():
 
 def create_json_file(f_path, data):
     script_path = os.path.realpath(__file__)
-    script_folder = script_path.replace(__file__, '')
+    file_name = os.path.basename(__file__)
+    script_folder = script_path.replace(file_name, '')
     data_folder = os.path.join(script_folder, 'data')
     final_file_path = os.path.join(data_folder, f_path)
 
