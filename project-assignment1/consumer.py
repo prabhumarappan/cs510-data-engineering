@@ -1,31 +1,26 @@
 #!/usr/bin/env python
-#
-# Copyright 2020 Confluent Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-
-# =============================================================================
-#
-# Consume messages from Confluent Cloud
-# Using Confluent Python Client for Apache Kafka
-#
-# =============================================================================
-
 from confluent_kafka import Consumer
 import json
+import os
 import ccloud_lib
 
+script_path = os.path.realpath(__file__)
+file_name = os.path.basename(__file__)
+script_folder = script_path.replace(file_name, '')
+FIXED_PATH = os.path.join(script_folder, "consumed")
+
+if not os.path.isdir(FIXED_PATH):
+    os.mkdir(FIXED_PATH)
+
+def dump_file(data):
+    trip_no = data["EVENT_NO_TRIP"]
+    time = data["ACT_TIME"]
+    date = data["OPD_DATE"]
+    key = "%s-%s-%s.json" % (date, trip_no, time)
+    file_path = os.path.join(FIXED_PATH, key)
+    fo = open(file_path, 'a')
+    json.dump(data, fo)
+    fo.close()
 
 if __name__ == '__main__':
 
@@ -66,6 +61,7 @@ if __name__ == '__main__':
                 record_value = msg.value()
                 data = json.loads(record_value)
                 total_count += 1
+                dump_file(data)
                 print("Consumed record with key {} and value {}, \
                       and updated total count to {}"
                       .format(record_key, record_value, total_count))
