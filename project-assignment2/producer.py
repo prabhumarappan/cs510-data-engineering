@@ -56,6 +56,12 @@ class KafkaProducer:
 
 kproducer = KafkaProducer()
 
+def get_data_from_json_file():
+    fo = open('05-01-2022.json')
+    data = json.load(fo)
+    fo.close()
+    return data
+
 # Function to get the file name for the new file
 def get_output_file_path():
     script_path = os.path.realpath(__file__)
@@ -183,14 +189,11 @@ def verify_data(data):
         return verifiedData
 
 def fetch_data():
-    f_path = get_output_file_path()
-    f_path = check_output_file(f_path)
     data = get_api_response()
+    # data = get_data_from_json_file()
     data=verify_data(data)
-    create_json_file(f_path, data)
     send_to_kafka(data)
     print("sent total of %d messages" % kproducer.delivered_records)
-    print("File created successfully %s" % f_path)   
 
 if __name__ == "__main__":
     fetch_data()
