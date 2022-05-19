@@ -5,7 +5,7 @@ import os
 import datetime as dt
 import ccloud_lib
 import glob
-from .crawler import crawl_stop_event_page
+from crawler import crawl_stop_event_page
 
 
 KAFKA_TOPIC = "stop-data"
