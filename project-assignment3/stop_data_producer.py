@@ -1,19 +1,13 @@
 #!/usr/bin/env python
 from confluent_kafka import Producer, KafkaError
 import json
-import time
-import random
 import os
 import datetime as dt
 import ccloud_lib
 import glob
-import requests as r
-import pandas as pd
-from pandas import json_normalize
 from .crawler import crawl_stop_event_page
 
 
-CTRAN_API = "http://www.psudataeng.com:8000/getBreadCrumbData"
 KAFKA_TOPIC = "stop-data"
 
 class KafkaProducer:
@@ -92,10 +86,6 @@ def check_output_file(f_path):
         f_path = just_file_name + "_" + str(len(matching_files) + 1) + ".json"
         
     return f_path
-
-def get_api_response():
-    response = r.get(CTRAN_API)
-    return response.json()
 
 def create_json_file(f_path, data):
     script_path = os.path.realpath(__file__)
