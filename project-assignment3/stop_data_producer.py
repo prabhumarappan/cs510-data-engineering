@@ -114,85 +114,9 @@ def send_to_kafka(data):
         kproducer.produce_data(KAFKA_TOPIC, key, d)
     kproducer.flush()
 
-def verify_data(data):
-    verifiedData=[]
-    mod=False
-    df=json_normalize(data)
-    
-    #OPD_DATE must exist
-    if(df['OPD_DATE'].isnull().values.any()):
-        df['OPD_DATE']=df['OPD_DATE'].interpolate(method='linear')
-        mod=True
-
-
-    #VEHICLE_ID must exist
-    if(df['VEHICLE_ID'].isnull().values.any()):
-        df['VEHICLE_ID']=df['VEHICLE_ID'].interpolate(method='linear')
-        mod=True
-
-    #DIRECTION must exist
-    if(df['DIRECTION'].isnull().values.any()):
-        df['DIRECTION']=df['DIRECTION'].interpolate(method='linear')
-        mod=True
-
-
-    #GPS_LONGITUDE must exist
-    if(df['GPS_LONGITUDE'].isnull().values.any()):
-        df['GPS_LONGITUDE']=df['GPS_LONGITUDE'].interpolate(method='linear')
-        mod=True
-
-
-    #GPS_LATITUDE must exist
-    if(df['GPS_LATITUDE'].isnull().values.any()):
-        df['GPS_LATITUDE']=df['GPS_LATITUDE'].interpolate(method='linear')
-        mod=True
-
-
-    #EVENT_NO_TRIP must exist
-    if(df['EVENT_NO_TRIP'].isnull().values.any()):
-        df['EVENT_NO_TRIP']=df['EVENT_NO_TRIP'].interpolate(method='linear')
-        mod=True
-
-    #ACT_TIME must exist
-    if(df['ACT_TIME'].isnull().values.any()):
-        df['ACT_TIME']=df['ACT_TIME'].interpolate(method='linear')
-        mod=True
-
-
-    #METERS must exist
-    if(df['METERS'].isnull().values.any()):
-        df['METERS']=df['METERS'].interpolate(method='linear')
-        mod=True
-
-
-    #VELOCITY must exist
-    if(df['VELOCITY'].isnull().values.any()):
-        df['VELOCITY']=df['VELOCITY'].interpolate(method='linear')
-        mod=True
-
-
-    #“Latitude and Longitude must present together”
-    if(df['GPS_LONGITUDE'].isnull().values.any() and df['GPS_LATITUDE'].isnull().values.any()):
-        df['GPS_LONGITUDE']=df['GPS_LONGITUDE'].interpolate(method='linear')
-        df['GPS_LATITUDE']=df['GPS_LATITUDE'].interpolate(method='linear')
-        mod=True
-
-    if(mod==False):
-        return data
-
-    else:
-        result = df.to_json(orient="index")
-        parsed = json.loads(result)
-        json.dumps(parsed, indent=4)
-        for i in parsed:
-            verifiedData.append(parsed[i])
-
-        return verifiedData
-
 def fetch_data():
     data = crawl_stop_event_page()
     # data = get_data_from_json_file()
-    # data=verify_data(data)
     send_to_kafka(data)
     print("sent total of %d messages" % kproducer.delivered_records)
 
