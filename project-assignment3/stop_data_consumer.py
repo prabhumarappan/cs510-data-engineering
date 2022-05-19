@@ -30,14 +30,14 @@ if not os.path.isdir(FIXED_PATH):
 
 
 def insert_stop_data(data):
-    sql = "INSERT INTO stop_event (trip_id, vehicle_id, leave_time, train, route_id, direction, stop_time, arrive_time, dwell, location_id, door, lift, ons, offs, estimated_load, maximum_distance, train_mileage, pattern_distance, location_distance, x_coordinate, y_coordinate, data_source, schedule_status) \
+    sql = "INSERT INTO stop_event (trip_id, vehicle_id, leave_time, train, route_id, direction, stop_time, arrive_time, dwell, location_id, door, lift, ons, offs, estimated_load, maximum_speed, train_mileage, pattern_distance, location_distance, x_coordinate, y_coordinate, data_source, schedule_status) \
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
 
     trip_id = data["trip_id"]
     vehicle_id = data["vehicle_number"]
     leave_time = data["leave_time"]
     train = data["train"]
-    route_id = data["route_id"]
+    route_id = data["route_number"]
     direction = data["direction"]
     stop_time = data["stop_time"]
     arrive_time =data["arrive_time"]
@@ -48,7 +48,7 @@ def insert_stop_data(data):
     ons = data["ons"]
     offs = data["offs"]
     estimated_load = data["estimated_load"]
-    maximum_distance = data["maximum distance"]
+    maximum_speed = data["maximum_speed"]
     train_mileage = data["train_mileage"]
     pattern_distance = data['pattern_distance']
     location_distance = data['location_distance']
@@ -57,7 +57,7 @@ def insert_stop_data(data):
     data_source = data['data_source']
     schedule_status = data['schedule_status']
     
-    cursor.execute(sql, (trip_id, vehicle_id, leave_time, train, route_id, direction, stop_time, arrive_time, dwell, location_id, door, lift, ons, offs, estimated_load, maximum_distance, train_mileage, pattern_distance, location_distance, x_coordinate, y_coordinate, data_source, schedule_status))
+    cursor.execute(sql, (trip_id, vehicle_id, leave_time, train, route_id, direction, stop_time, arrive_time, dwell, location_id, door, lift, ons, offs, estimated_load, maximum_speed, train_mileage, pattern_distance, location_distance, x_coordinate, y_coordinate, data_source, schedule_status))
 
 
 def send_to_db(data):

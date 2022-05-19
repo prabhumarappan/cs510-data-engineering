@@ -100,12 +100,14 @@ def create_json_file(f_path, data):
 
 def send_to_kafka(data):
     for d in data:
-        key = d["trip_id"]
+        key = str(d["trip_id"])
         kproducer.produce_data(KAFKA_TOPIC, key, d)
     kproducer.flush()
 
 def fetch_data():
+    print("Starting Crawling")
     data = crawl_stop_event_page()
+    print("Finished Crawling Data")
     # data = get_data_from_json_file()
     send_to_kafka(data)
     print("sent total of %d messages" % kproducer.delivered_records)
