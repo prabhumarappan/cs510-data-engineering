@@ -6,6 +6,7 @@ import datetime as dt
 import ccloud_lib
 import glob
 from crawler import crawl_stop_event_page
+from pandas import json_normalize
 
 
 KAFKA_TOPIC = "stop-data"
@@ -104,11 +105,36 @@ def send_to_kafka(data):
         kproducer.produce_data(KAFKA_TOPIC, key, d)
     kproducer.flush()
 
+def verify_stopEvent_data(data):
+    verifiedData=[]
+    mod=False
+    df=json_normalize(data)
+    
+    columns = ['vehicle_number', 'leave_time','train','route_number','direction','stop_time','arrive_time','dwell','location_id','door','lift','ons','offs','estimated_load','maximum_speed','train_mileage','pattern_distance','location_distance','x_coordinate','y_coordinate','data_source','schedule_status','trip_id']
+    
+    for col in columns:
+        if(df[col].isnull().values.any()):
+            df[col]=df[col].interpolate(method='linear')
+            mod=True
+
+    if(mod):
+        result = df.to_json(orient="index")
+        parsed = json.loads(result)
+        json.dumps(parsed, indent=4)
+        for i in parsed:
+            verifiedData.append(parsed[i])
+
+        return verifiedData
+    
+    else:
+        return data
+
 def fetch_data():
     print("Starting Crawling")
     data = crawl_stop_event_page()
     print("Finished Crawling Data")
     # data = get_data_from_json_file()
+    data=verify_stopEvent_data(data)
     send_to_kafka(data)
     print("sent total of %d messages" % kproducer.delivered_records)
 
