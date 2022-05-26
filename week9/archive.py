@@ -28,12 +28,15 @@ import ccloud_lib
 import zlib
 from cryptography.fernet import Fernet
 import uuid
+import os
 from cloud_storage import upload_file
 
-key = "X1YY13zHRNr/HJpumms1Zg=="
+key = "sFmAIBsWchNS5jew5T1NGw3o_JLIP--88pK8T1tcdkg="
 
 def compress_data(data):
     compress = zlib.compressobj(zlib.Z_DEFAULT_COMPRESSION, zlib.DEFLATED, -15)
+    data = json.dumps(data)
+    data = data.encode('utf-8')
     compressed_data = compress.compress(data)
     compressed_data += compress.flush()
 
@@ -41,18 +44,21 @@ def compress_data(data):
 
 def encrypt_data(data):
     fernet = Fernet(key)
-    encMessage = fernet.encrypt(data.encode())
+    encMessage = fernet.encrypt(data)
     
     return encMessage
 
 def output_to_file(data):
-    
     file_name = '/tmp/%s' % uuid.uuid4()
     fo = open(file_name, 'wb')
     fo.write(data)
     fo.close()
 
     return file_name
+
+def delete_local_file(file_path):
+    if os.path.exists(file_path):
+        os.remove(file_path)
 
 if __name__ == '__main__':
 
@@ -98,9 +104,10 @@ if __name__ == '__main__':
                 data = encrypt_data(data)
                 file_name = output_to_file(data)
                 upload_file(file_name)
-                # print("Consumed record with key {} and value {}, \
-                #       and updated total count to {}"
-                #       .format(record_key, record_value, total_count))
+                delete_local_file(file_name)
+                print("Archived record with key {} and value {}, \
+                      and updated total count to {}"
+                      .format(record_key, record_value, total_count))
     except KeyboardInterrupt:
         pass
     finally:
