@@ -25,7 +25,34 @@
 from confluent_kafka import Consumer
 import json
 import ccloud_lib
+import zlib
+from cryptography.fernet import Fernet
+import uuid
+from cloud_storage import upload_file
 
+key = "X1YY13zHRNr/HJpumms1Zg=="
+
+def compress_data(data):
+    compress = zlib.compressobj(zlib.Z_DEFAULT_COMPRESSION, zlib.DEFLATED, -15)
+    compressed_data = compress.compress(data)
+    compressed_data += compress.flush()
+
+    return compressed_data
+
+def encrypt_data(data):
+    fernet = Fernet(key)
+    encMessage = fernet.encrypt(data.encode())
+    
+    return encMessage
+
+def output_to_file(data):
+    
+    file_name = '/tmp/%s' % uuid.uuid4()
+    fo = open(file_name, 'wb')
+    fo.write(data)
+    fo.close()
+
+    return file_name
 
 if __name__ == '__main__':
 
@@ -67,7 +94,10 @@ if __name__ == '__main__':
                 record_value = msg.value()
                 data = json.loads(record_value)
                 total_count += 1
-                print("DOING SOMETHING WITH RECORD")
+                data = compress_data(data)
+                data = encrypt_data(data)
+                file_name = output_to_file(data)
+                upload_file(file_name)
                 # print("Consumed record with key {} and value {}, \
                 #       and updated total count to {}"
                 #       .format(record_key, record_value, total_count))
