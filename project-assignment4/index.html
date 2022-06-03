@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8' />
+    <title>Document</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <h3>Python SimpleHTTPServer</h3>
+    <div id='map'></div>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoicHJhYmh1cGR4IiwiYSI6ImNsM2RmYTkwbDA3eDIzanJzeHhocDI2OXQifQ.hd44qyeT2ChiUgkFSAtGUg';
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/dark-v10',
+            center: [-122.584785, 45.656095],
+            zoom: 12
+        });
+
+        map.on('load', () => {
+            map.addSource('path', {
+                type: 'geojson',
+                data: 'geojson_data/max_load_path.geojson'
+            });
+
+            map.addSource('load', {
+                type: 'geojson',
+                data: 'geojson_data/max_load.geojson'
+            });
+
+            map.addSource('empty', {
+                type: 'geojson',
+                data: { type: 'FeatureCollection', features: [] }
+            });
+
+
+            const zIndex2 = map.addLayer({
+            id: 'z-index-2',
+            type: 'symbol',
+            source: 'empty'
+            });
+
+            const zIndex1 = map.addLayer({
+            id: 'z-index-1',
+            type: 'symbol',
+            source: 'empty'
+            }, 'z-index-2');
+            
+
+            map.addLayer({
+                'id': 'route',
+                'type': 'line',
+                'source': 'path',
+                'layout': {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                'paint': {
+                    'line-color': '#888',
+                    'line-width': 8
+                }
+            }, 'z-index-1');
+
+            map.addLayer({
+                id: 'speeds-point',
+                type: 'circle',
+                source: 'load',
+                minzoom: 10,
+                paint: {
+                    // increase the radius of the circle as the zoom level and speed value increases
+                    'circle-radius': {
+                        base: 1.75,
+                        property: 'speed',
+                        type: 'exponential',
+                        stops: [
+                            [{
+                                zoom: 10,
+                                value: 1
+                            }, 5],
+                        ]
+                    },
+                    'circle-color': {
+                        property: 'speed',
+                        type: 'exponential',
+                        stops: [
+                            [5, 'rgb(4, 244, 32)'],
+                            [10, 'rgb(8, 249, 71)'],
+                            [15, 'rgb(10, 183, 121)'],
+                            [20, 'rgb(15, 83, 4)'],
+                            [25, 'rgb(120, 32, 4)'],
+                            [30, 'rgb(160, 32, 4)'],
+                            [35, 'rgb(180, 32, 4)'],
+                            [40, 'rgb(200, 32, 4)'],
+                            [45, 'rgb(244, 32, 4)'],
+                        ]
+                    },
+                }
+            }, 'z-index-2');
+
+
+            map.addSource('hpath', {
+                type: 'geojson',
+                data: 'geojson_data/highest_trips_path.geojson'
+            });
+
+            map.addSource('hload', {
+                type: 'geojson',
+                data: 'geojson_data/highest_trips.geojson'
+            });
+
+            map.addSource('emptyh', {
+                type: 'geojson',
+                data: { type: 'FeatureCollection', features: [] }
+            });
+
+
+            const zIndex4 = map.addLayer({
+            id: 'z-index-4',
+            type: 'symbol',
+            source: 'emptyh'
+            });
+
+            const zIndex3 = map.addLayer({
+            id: 'z-index-3',
+            type: 'symbol',
+            source: 'empty'
+            }, 'z-index-4');
+            
+
+            map.addLayer({
+                'id': 'routeh',
+                'type': 'line',
+                'source': 'hpath',
+                'layout': {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                'paint': {
+                    'line-color': '#888',
+                    'line-width': 8
+                }
+            }, 'z-index-1');
+
+            map.addLayer({
+                id: 'highest_trips_load',
+                type: 'circle',
+                source: 'hload',
+                minzoom: 10,
+                paint: {
+                    // increase the radius of the circle as the zoom level and speed value increases
+                    'circle-radius': {
+                        base: 1.75,
+                        property: 'speed',
+                        type: 'exponential',
+                        stops: [
+                            [{
+                                zoom: 10,
+                                value: 1
+                            }, 5],
+                        ]
+                    },
+                    'circle-color': {
+                        property: 'speed',
+                        type: 'exponential',
+                        stops: [
+                            [5, 'rgb(4, 244, 32)'],
+                            [10, 'rgb(8, 249, 71)'],
+                            [15, 'rgb(10, 183, 121)'],
+                            [20, 'rgb(15, 83, 4)'],
+                            [25, 'rgb(120, 32, 4)'],
+                            [30, 'rgb(160, 32, 4)'],
+                            [35, 'rgb(180, 32, 4)'],
+                            [40, 'rgb(200, 32, 4)'],
+                            [45, 'rgb(244, 32, 4)'],
+                        ]
+                    },
+                }
+            }, 'z-index-2');
+
+        });
+
+        map.on('click', 'speeds-point', function (e) {
+            new mapboxgl.Popup()
+                .setLngLat(e.features[0].geometry.coordinates)
+                .setHTML('<b>Estimated Load:</b> ' + e.features[0].properties.speed)
+                .addTo(map);
+        });
+
+        map.on('click', 'highest_trips_load', function (e) {
+            new mapboxgl.Popup()
+                .setLngLat(e.features[0].geometry.coordinates)
+                .setHTML('<b>Estimated Load:</b> ' + e.features[0].properties.speed)
+                .addTo(map);
+        });
+
+    </script>
+</body>
+
+</html>
